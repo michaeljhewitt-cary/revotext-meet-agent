@@ -1,0 +1,22 @@
+[project]
+name = "revotext-meet-agent"
+version = "0.1.0"
+description = "LiveKit transcription agent — pipes participant audio through Whisper and publishes TranscriptionSegments back to the room"
+requires-python = ">=3.10"
+dependencies = [
+  "livekit-agents>=0.10.0",
+  "livekit-plugins-openai>=0.10.0",
+  "livekit-plugins-silero>=0.7.0",
+  "livekit-plugins-faster-whisper>=0.1.0; python_version < '3.13'",
+  "python-dotenv>=1.0.0",
+]
+
+[project.scripts]
+revotext-agent = "agent:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["agent"]
