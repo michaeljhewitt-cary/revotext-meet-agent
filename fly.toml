@@ -1,32 +1,26 @@
-# Fly.io configuration for the RevoText Meet transcription agent.
-# Deploy with:
-#   fly auth login
-#   fly launch --no-deploy --copy-config --name revotext-meet-agent
-#   fly secrets set LIVEKIT_URL=... LIVEKIT_API_KEY=... LIVEKIT_API_SECRET=...
-#   fly deploy
+# fly.toml app configuration file generated for revotext-meet-agent on 2026-05-15T23:52:15-04:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "revotext-meet-agent"
-primary_region = "iad"
-kill_signal = "SIGINT"
-kill_timeout = "30s"
+app = 'revotext-meet-agent'
+primary_region = 'iad'
+kill_signal = 'SIGINT'
+kill_timeout = '30s'
 
 [build]
-  dockerfile = "Dockerfile"
-
-[env]
-  # Pre-pull the local Whisper model on container start. Set WHISPER_MODE=whisperx
-  # via `fly secrets` to point at your rt-meet-whisperx service instead.
-  WHISPER_MODE = "local"
-  WHISPER_MODEL = "base.en"
-  WHISPER_COMPUTE = "int8"
-
-# Agent is a worker (no inbound HTTP), so no [[services]] block.
-# We do expose the optional livekit-agents healthcheck port if enabled later.
-
-[[vm]]
-  cpu_kind = "shared"
-  cpus = 2
-  memory = "2gb"
+  dockerfile = 'Dockerfile'
 
 [deploy]
-  strategy = "rolling"
+  strategy = 'rolling'
+
+[env]
+  WHISPER_COMPUTE = 'int8'
+  WHISPER_MODE = 'local'
+  WHISPER_MODEL = 'base.en'
+
+[[vm]]
+  memory = '2gb'
+  cpu_kind = 'shared'
+  cpus = 2
+  memory_mb = 2048

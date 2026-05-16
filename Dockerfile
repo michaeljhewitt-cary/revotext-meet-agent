@@ -14,9 +14,10 @@ RUN pip install --no-cache-dir \
       "livekit-agents>=0.10.0" \
       "livekit-plugins-openai>=0.10.0" \
       "livekit-plugins-silero>=0.7.0" \
-      "livekit-plugins-faster-whisper>=0.1.0"
+      "faster-whisper>=1.0.0" \
+      "aiohttp>=3.9.0"
 
-COPY agent.py .
+COPY agent.py local_whisper_stt.py whisperx_stt.py ./
 
 # Download the Whisper model at build time so first room join isn't slow
 ENV WHISPER_MODEL=base.en

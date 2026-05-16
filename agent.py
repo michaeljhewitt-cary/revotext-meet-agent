@@ -60,20 +60,21 @@ def build_stt() -> agents.stt.STT:
         logger.info("STT: OpenAI Whisper API")
         return openai.STT(model="whisper-1", language="en")
 
-    # local — faster-whisper
+    # local — faster-whisper via custom wrapper
     try:
-        from livekit.plugins import faster_whisper  # type: ignore
+        from local_whisper_stt import LocalWhisperSTT  # type: ignore
+
         logger.info("STT: local faster-whisper %s", os.getenv("WHISPER_MODEL", "base.en"))
-        return faster_whisper.STT(
+        return LocalWhisperSTT(
             model_size=os.getenv("WHISPER_MODEL", "base.en"),
             compute_type=os.getenv("WHISPER_COMPUTE", "int8"),
+            device=os.getenv("WHISPER_DEVICE", "cpu"),
             language="en",
         )
     except ImportError:
         logger.warning(
-            "livekit-plugins-faster-whisper not installed; install with "
-            "`uv pip install livekit-plugins-faster-whisper` for local STT. "
-            "Falling back to OpenAI Whisper API."
+            "faster-whisper not installed; falling back to OpenAI Whisper API. "
+            "Install with `pip install faster-whisper`."
         )
         return openai.STT(model="whisper-1", language="en")
 
