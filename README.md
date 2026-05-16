@@ -66,16 +66,32 @@ Switch via `WHISPER_MODE` in `.env`. For production, consider Deepgram (separate
 
 Pick a host that can run a long-lived Python process:
 
-### Fly.io (cheap, easy)
+### Fly.io (cheap, easy — config included)
+
+A `fly.toml` is committed at the repo root. Steps:
 
 ```bash
-fly launch                 # follow prompts
+brew install flyctl
+fly auth login
+fly launch --no-deploy --copy-config --name revotext-meet-agent
 fly secrets set \
-  LIVEKIT_URL=wss://... \
-  LIVEKIT_API_KEY=... \
-  LIVEKIT_API_SECRET=...
+  LIVEKIT_URL=wss://revo-test-ui-4zvndup0.livekit.cloud \
+  LIVEKIT_API_KEY=APIrhk9c38MkEPk \
+  LIVEKIT_API_SECRET=3P9fQdjEvgFrt7O3cW48n1epPMpAk89aXEPmhD0UQ8fB
 fly deploy
 ```
+
+To use rt-meet-whisperx as the STT engine instead of local faster-whisper:
+
+```bash
+fly secrets set \
+  WHISPER_MODE=whisperx \
+  WHISPERX_URL=https://whisperx.your-domain.com \
+  WHISPERX_API_KEY=your-key
+fly deploy
+```
+
+VM is sized for `base.en` local Whisper (2 CPU / 2 GB RAM). For `medium` or `large-v3` you'll want GPU — bump to `fly machines run --vm-size performance-2x` or move to a GPU host.
 
 ### Hetzner / NixOS (where Cullin already runs revotext-meet-server)
 

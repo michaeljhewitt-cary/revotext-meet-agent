@@ -40,16 +40,30 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname
 # ---------------------------------------------------------------------------
 def build_stt() -> agents.stt.STT:
     mode = os.getenv("WHISPER_MODE", "local").lower()
+
+    if mode == "whisperx":
+        url = os.environ.get("WHISPERX_URL")
+        if not url:
+            raise RuntimeError("WHISPER_MODE=whisperx needs WHISPERX_URL")
+        from whisperx_stt import WhisperXSTT
+        logger.info("STT: rt-meet-whisperx @ %s", url)
+        return WhisperXSTT(
+            endpoint=url,
+            api_key=os.environ.get("WHISPERX_API_KEY"),
+            model=os.environ.get("WHISPERX_MODEL"),
+            language="en",
+        )
+
     if mode == "api":
         if not os.getenv("OPENAI_API_KEY"):
             raise RuntimeError("WHISPER_MODE=api needs OPENAI_API_KEY")
+        logger.info("STT: OpenAI Whisper API")
         return openai.STT(model="whisper-1", language="en")
-    # local — faster-whisper via livekit-plugins-openai-whisper.
-    # Use the canonical local plugin if installed; otherwise fall back to OpenAI
-    # API mode and log a hint.
+
+    # local — faster-whisper
     try:
         from livekit.plugins import faster_whisper  # type: ignore
-
+        logger.info("STT: local faster-whisper %s", os.getenv("WHISPER_MODEL", "base.en"))
         return faster_whisper.STT(
             model_size=os.getenv("WHISPER_MODEL", "base.en"),
             compute_type=os.getenv("WHISPER_COMPUTE", "int8"),
